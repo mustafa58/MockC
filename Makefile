@@ -1,11 +1,14 @@
 CC=gcc
 SRC=$(wildcard *.c)
-TST=$(patsubst %.c, %.o, $(wildcard test*.c))
+TST=$(patsubst %.c, %.o, $(wildcard *test*.c))
 OBJ=$(filter-out $(TST), $(patsubst %.c, %.o, $(SRC)))
 TSTOBJ=$(patsubst %.o, __%.o, $(OBJ))
 BIN=testmain
 
-test: $(BIN)
+all: $(BIN)
+
+clean:
+	rm *.o testmain
 
 $(BIN): weak_symbols $(TSTOBJ) $(TST)
 	$(CC) $(TSTOBJ) $(TST) -o $(BIN)
@@ -22,6 +25,6 @@ $(OBJ): %.o: %.c
 	$(CC) -c $<
 
 weak_symbols: $(SRC)
-	@for f in `ls test*.c`; do \
+	@for f in `ls *test*.c`; do \
 	  awk -F'(' '/@weaken/{getline; print $$1}' $$f | awk '{ print $$2 }' >> weak_symbols;\
 	done
